@@ -236,6 +236,9 @@ class Playlist(EventEmitter):
             return None
 
         entry = self.entries.popleft()
+        # print("------------")
+        # print("Current song")
+        # print(entry.url)
 
         if predownload_next:
             next_entry = self.peek()

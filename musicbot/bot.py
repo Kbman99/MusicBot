@@ -22,11 +22,18 @@ from datetime import timedelta
 from random import choice, shuffle
 from collections import defaultdict
 
+# Change these back
 from musicbot.playlist import Playlist
 from musicbot.player import MusicPlayer
 from musicbot.config import Config, ConfigDefaults
 from musicbot.permissions import Permissions, PermissionsDefaults
 from musicbot.utils import load_file, write_file, sane_round_int
+
+# from playlist import Playlist
+# from player import MusicPlayer
+# from config import Config, ConfigDefaults
+# from permissions import Permissions, PermissionsDefaults
+# from utils import load_file, write_file, sane_round_int
 
 from . import exceptions
 from . import downloader

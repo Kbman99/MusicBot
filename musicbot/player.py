@@ -2,6 +2,8 @@ import os
 import asyncio
 import audioop
 import traceback
+import requests
+from .constants import WEBHOOK_URL
 
 from enum import Enum
 from array import array
@@ -261,6 +263,13 @@ class MusicPlayer(EventEmitter):
                 # I need to add ytdl hooks
                 self.state = MusicPlayerState.PLAYING
                 self._current_entry = entry
+
+                # This grabs the current playing song URL
+                print("------------------------------")
+                print("Current song: " + self._current_entry.url + " - " + str(self._current_entry.duration) + " seconds long")
+
+                # Post the currently playing song to the site
+                requests.post(WEBHOOK_URL, json={"message": self._current_entry.url})
 
                 self._current_player.start()
                 self.emit('play', player=self, entry=entry)
