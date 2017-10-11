@@ -31,13 +31,14 @@ class Playlist(EventEmitter):
     def clear(self):
         self.entries.clear()
 
-    async def add_entry(self, song_url, **meta):
+    async def add_entry(self, song_url, requester=None, **meta):
         """
             Validates and adds a song_url to be played. This does not start the download of the song.
 
             Returns the entry & the position it is in the queue.
 
             :param song_url: The song url to add to the playlist.
+            :param requester: The name of the twitter account which submitted the song request
             :param meta: Any additional metadata to add to the playlist entry.
         """
 
@@ -76,6 +77,7 @@ class Playlist(EventEmitter):
         entry = URLPlaylistEntry(
             self,
             song_url,
+            requester,
             info.get('title', 'Untitled'),
             info.get('duration', 0) or 0,
             self.downloader.ytdl.prepare_filename(info),

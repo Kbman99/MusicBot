@@ -101,6 +101,7 @@ class MusicPlayer(EventEmitter):
         self._play_lock = asyncio.Lock()
         self._current_player = None
         self._current_entry = None
+        self.current_entry_requester = None
         self.state = MusicPlayerState.STOPPED
 
         self.loop.create_task(self.websocket_check())
@@ -269,7 +270,13 @@ class MusicPlayer(EventEmitter):
                 print("Current song: " + self._current_entry.url + " - " + str(self._current_entry.duration) + " seconds long")
 
                 # Post the currently playing song to the site
-                requests.post(WEBHOOK_URL, json={"message": self._current_entry.url})
+                requests.post(WEBHOOK_URL,
+                              json={
+                                  "message": {
+                                      "song_url": self._current_entry.url,
+                                      "song_requester": self._current_entry.requester
+                                  }
+                              })
 
                 self._current_player.start()
                 self.emit('play', player=self, entry=entry)

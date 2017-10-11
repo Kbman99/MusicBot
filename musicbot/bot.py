@@ -869,7 +869,10 @@ class MusicBot(discord.Client):
         await self.send_typing(channel)
 
         if leftover_args:
-            song_url = ' '.join([song_url, *leftover_args])
+            # song_url = ' '.join([song_url, *leftover_args])
+            current_entry_requester = leftover_args[0]
+        else:
+            current_entry_requester = None
 
         try:
             info = await self.downloader.extract_info(player.playlist.loop, song_url, download=False, process=False)
@@ -1010,7 +1013,7 @@ class MusicBot(discord.Client):
                 )
 
             try:
-                entry, position = await player.playlist.add_entry(song_url, channel=channel, author=author)
+                entry, position = await player.playlist.add_entry(song_url, requester=current_entry_requester, channel=channel, author=author)
 
             except exceptions.WrongEntryTypeError as e:
                 if e.use_url == song_url:
