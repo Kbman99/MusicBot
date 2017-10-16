@@ -8,7 +8,7 @@ AUDIO_CACHE_PATH = os.path.join(os.getcwd(), 'audio_cache')
 DISCORD_MSG_CHAR_LIMIT = 2000
 
 # Change based on where you send the POST request to
-DEBUG = True
+DEBUG = False
 if DEBUG:
     WEBHOOK_URL = "http://127.0.0.1:5000/webhook"
 else:
