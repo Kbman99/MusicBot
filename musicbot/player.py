@@ -270,14 +270,18 @@ class MusicPlayer(EventEmitter):
                 print("Current song: " + self._current_entry.url + " - " + str(self._current_entry.duration) + " seconds long")
 
                 # Post the currently playing song to the site
-                requests.post(WEBHOOK_URL,
-                              json={
-                                  "message": {
-                                      "song_url": self._current_entry.url,
-                                      "song_requester": self._current_entry.requester
-                                  }
-                              })
+                try:
+                    r = requests.post(WEBHOOK_URL,
+                                  json={
+                                      "message": {
+                                          "song_url": self._current_entry.url,
+                                          "song_requester": self._current_entry.requester
+                                      }
+                                  })
+                except ConnectionError as e:
+                    print("Error {} occurred and we were unable to connect to the webserver".format(e))
 
+                print(r.status_code)
                 self._current_player.start()
                 self.emit('play', player=self, entry=entry)
 
