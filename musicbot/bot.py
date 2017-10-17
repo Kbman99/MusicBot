@@ -34,6 +34,7 @@ from musicbot.utils import load_file, write_file, sane_round_int
 # from config import Config, ConfigDefaults
 # from permissions import Permissions, PermissionsDefaults
 # from utils import load_file, write_file, sane_round_int
+from .utils import ftimedelta
 
 from . import exceptions
 from . import downloader
@@ -471,7 +472,7 @@ class MusicBot(discord.Client):
             name = u'{}{}'.format(prefix, entry.title)[:128]
             game = discord.Game(name=name)
 
-        await self.change_status(game)
+        await self.change_presence(game=game)
 
 
     async def safe_send_message(self, dest, content, *, tts=False, expire_in=0, also_delete=None, quiet=False):
@@ -1389,6 +1390,51 @@ class MusicBot(discord.Client):
 
         await self.safe_delete_message(hand, quiet=True)
         return Response(":ok_hand:", delete_after=15)
+
+    async def cmd_np(self, player, channel, server, message):
+        """
+        Usage:
+            {command_prefix}np
+        Displays the current song in chat.
+        """
+
+        if player.current_entry:
+            if self.server_specific_data[server]['last_np_msg']:
+                await self.safe_delete_message(self.server_specific_data[server]['last_np_msg'])
+                self.server_specific_data[server]['last_np_msg'] = None
+
+            # TODO: Fix timedelta garbage with util function
+            song_progress = ftimedelta(timedelta(seconds=player.progress))
+            song_total = ftimedelta(timedelta(seconds=player.current_entry.duration))
+
+            prog_str = ('`[{progress}/{total}]`').format(
+                progress=song_progress, total=song_total
+            )
+            action_text = 'Playing'
+
+            if player.current_entry.meta.get('channel', False) and player.current_entry.meta.get('author', False):
+                np_text = "Now {action}: **{title}** added by **{author}** {progress}\n\N{WHITE RIGHT POINTING BACKHAND INDEX} <{url}>".format(
+                    action=action_text,
+                    title=player.current_entry.title,
+                    author=player.current_entry.meta['author'].name,
+                    progress=prog_str,
+                    url=player.current_entry.url
+                )
+            else:
+                np_text = "Now {action}: **{title}** {progress}\n\N{WHITE RIGHT POINTING BACKHAND INDEX} <{url}>".format(
+                    action=action_text,
+                    title=player.current_entry.title,
+                    progress=prog_str,
+                    url=player.current_entry.url
+                )
+
+            self.server_specific_data[server]['last_np_msg'] = await self.safe_send_message(channel, np_text)
+            await self._manual_delete_check(message)
+        else:
+            return Response(
+                'There are no songs queued! Queue something with {}play.'.format(self.config.command_prefix),
+                delete_after=30
+            )
 
     async def cmd_clear(self, player, author):
         """

@@ -37,6 +37,11 @@ def slugify(value):
     return re.sub('[-\s]+', '-', value)
 
 
+def ftimedelta(td):
+    p1, p2 = str(td).rsplit(':', 1)
+    return ':'.join([p1, str(int(float(p2)))])
+
+
 def sane_round_int(x):
     return int(decimal.Decimal(x).quantize(1, rounding=decimal.ROUND_HALF_UP))
 
